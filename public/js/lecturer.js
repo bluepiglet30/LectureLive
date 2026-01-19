@@ -146,12 +146,14 @@ function updateHistogram(histogram) {
 function updateTimeSeries(history) {
     const ctx = document.getElementById('time-series').getContext('2d');
 
-    const labels = history.map(point => point.time);
-    const data = history.map(point => point.mean);
+    // Convert to {x: timestamp, y: mean} format for time scale
+    const data = history.map(point => ({
+        x: new Date(point.timestamp),
+        y: point.mean
+    }));
 
     if (timeSeriesChart) {
         // Update existing chart
-        timeSeriesChart.data.labels = labels;
         timeSeriesChart.data.datasets[0].data = data;
         timeSeriesChart.update('none');
     } else {
@@ -164,7 +166,6 @@ function updateTimeSeries(history) {
         timeSeriesChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels,
                 datasets: [{
                     label: 'Average Understanding',
                     data: data,
@@ -193,8 +194,16 @@ function updateTimeSeries(history) {
                         titleFont: { size: 14 },
                         bodyFont: { size: 13 },
                         callbacks: {
+                            title: function (context) {
+                                const date = new Date(context[0].parsed.x);
+                                return date.toLocaleTimeString('en-US', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit'
+                                });
+                            },
                             label: function (context) {
-                                return `Average: ${context.raw.toFixed(2)}`;
+                                return `Average: ${context.parsed.y.toFixed(2)}`;
                             }
                         }
                     }
@@ -216,6 +225,13 @@ function updateTimeSeries(history) {
                         }
                     },
                     x: {
+                        type: 'time',
+                        time: {
+                            unit: 'second',
+                            displayFormats: {
+                                second: 'HH:mm:ss'
+                            }
+                        },
                         ticks: {
                             color: 'rgba(255, 255, 255, 0.6)',
                             maxRotation: 45,
