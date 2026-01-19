@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LectureLive - Student</title>
+    <link rel="stylesheet" href="css/student.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 LectureLive</h1>
+            <p class="subtitle">How are you following the lecture?</p>
+        </header>
+
+        <div class="state-buttons">
+            <button class="state-btn" data-state="1">
+                <span class="emoji">😵</span>
+                <span class="label">Completely Lost</span>
+                <span class="number">1</span>
+            </button>
+            
+            <button class="state-btn" data-state="2">
+                <span class="emoji">😕</span>
+                <span class="label">Struggling</span>
+                <span class="number">2</span>
+            </button>
+            
+            <button class="state-btn" data-state="3">
+                <span class="emoji">🙂</span>
+                <span class="label">Following Along</span>
+                <span class="number">3</span>
+            </button>
+            
+            <button class="state-btn" data-state="4">
+                <span class="emoji">😊</span>
+                <span class="label">Comfortable</span>
+                <span class="number">4</span>
+            </button>
+            
+            <button class="state-btn" data-state="5">
+                <span class="emoji">🚀</span>
+                <span class="label">Speed Up!</span>
+                <span class="number">5</span>
+            </button>
+        </div>
+
+        <div class="status-message" id="status"></div>
+    </div>
+
+    <script src="js/student.js"></script>
+</body>
+</html>

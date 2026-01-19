@@ -1,0 +1,188 @@
+// Chart instance
+let histogramChart = null;
+
+// Mean descriptions based on value
+function getMeanDescription(mean) {
+    if (mean === 0) return 'Waiting for students...';
+    if (mean < 2) return 'Students are struggling! Consider slowing down.';
+    if (mean < 3) return 'Some students need more explanation.';
+    if (mean < 4) return 'Most students are following along.';
+    if (mean < 4.5) return 'Class is comfortable with the pace.';
+    return 'Students want you to speed up!';
+}
+
+// Update the stats display
+function updateStats(stats) {
+    const meanEl = document.getElementById('mean-value');
+    const countEl = document.getElementById('student-count');
+    const descEl = document.getElementById('mean-description');
+
+    // Update mean
+    if (stats.count === 0) {
+        meanEl.textContent = '--';
+    } else {
+        meanEl.textContent = stats.mean.toFixed(1);
+    }
+
+    // Update count
+    countEl.textContent = stats.count;
+
+    // Update description
+    descEl.textContent = getMeanDescription(stats.mean);
+
+    // Update histogram
+    updateHistogram(stats.histogram);
+}
+
+// Initialize or update the histogram chart
+function updateHistogram(histogram) {
+    const ctx = document.getElementById('histogram').getContext('2d');
+
+    const data = [
+        histogram[1] || 0,
+        histogram[2] || 0,
+        histogram[3] || 0,
+        histogram[4] || 0,
+        histogram[5] || 0
+    ];
+
+    const colors = [
+        'rgba(239, 68, 68, 0.8)',   // Red
+        'rgba(249, 115, 22, 0.8)',  // Orange
+        'rgba(234, 179, 8, 0.8)',   // Yellow
+        'rgba(34, 197, 94, 0.8)',   // Green
+        'rgba(59, 130, 246, 0.8)'   // Blue
+    ];
+
+    const borderColors = [
+        'rgb(239, 68, 68)',
+        'rgb(249, 115, 22)',
+        'rgb(234, 179, 8)',
+        'rgb(34, 197, 94)',
+        'rgb(59, 130, 246)'
+    ];
+
+    if (histogramChart) {
+        // Update existing chart
+        histogramChart.data.datasets[0].data = data;
+        histogramChart.update('none');
+    } else {
+        // Create new chart
+        histogramChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['1', '2', '3', '4', '5'],
+                datasets: [{
+                    label: 'Students',
+                    data: data,
+                    backgroundColor: colors,
+                    borderColor: borderColors,
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 13 },
+                        callbacks: {
+                            title: function (context) {
+                                const labels = [
+                                    'Completely Lost',
+                                    'Struggling',
+                                    'Following Along',
+                                    'Comfortable',
+                                    'Speed Up!'
+                                ];
+                                return labels[context[0].dataIndex];
+                            },
+                            label: function (context) {
+                                const count = context.raw;
+                                return count === 1 ? '1 student' : `${count} students`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            color: 'rgba(255, 255, 255, 0.6)'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            font: { size: 14, weight: 'bold' }
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Reset all responses
+async function resetResponses() {
+    if (!confirm('Are you sure you want to reset all student responses?')) {
+        return;
+    }
+
+    try {
+        await fetch('/api/reset', { method: 'POST' });
+    } catch (error) {
+        console.error('Error resetting:', error);
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    // Connect to Socket.IO
+    const socket = io();
+
+    // Add connection status indicator
+    const statusDiv = document.createElement('div');
+    statusDiv.className = 'connection-status';
+    statusDiv.innerHTML = '<span class="status-dot"></span><span class="status-text">Connecting...</span>';
+    document.body.appendChild(statusDiv);
+
+    socket.on('connect', () => {
+        statusDiv.className = 'connection-status connected';
+        statusDiv.querySelector('.status-text').textContent = 'Live';
+    });
+
+    socket.on('disconnect', () => {
+        statusDiv.className = 'connection-status disconnected';
+        statusDiv.querySelector('.status-text').textContent = 'Disconnected';
+    });
+
+    // Listen for stats updates
+    socket.on('stats-update', (stats) => {
+        updateStats(stats);
+    });
+
+    // Reset button
+    document.getElementById('reset-btn').addEventListener('click', resetResponses);
+
+    // Initial fetch
+    fetch('/api/stats')
+        .then(res => res.json())
+        .then(stats => updateStats(stats))
+        .catch(err => console.error('Error fetching initial stats:', err));
+});

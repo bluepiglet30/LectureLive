@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LectureLive - Lecturer Dashboard</title>
+    <link rel="stylesheet" href="css/lecturer.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 LectureLive Dashboard</h1>
+            <p class="subtitle">Real-time student feedback</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card mean-card">
+                <div class="stat-label">Average Understanding</div>
+                <div class="stat-value" id="mean-value">--</div>
+                <div class="stat-description" id="mean-description">Waiting for students...</div>
+            </div>
+
+            <div class="stat-card count-card">
+                <div class="stat-label">Active Students</div>
+                <div class="stat-value" id="student-count">0</div>
+                <div class="stat-description">responses received</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Response Distribution</h2>
+            <canvas id="histogram"></canvas>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-color" style="background: #ef4444;"></span>
+                <span>1 - Completely Lost</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #f97316;"></span>
+                <span>2 - Struggling</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #eab308;"></span>
+                <span>3 - Following Along</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #22c55e;"></span>
+                <span>4 - Comfortable</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #3b82f6;"></span>
+                <span>5 - Speed Up!</span>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="reset-btn" id="reset-btn">🔄 Reset All Responses</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/lecturer.js"></script>
+</body>
+
+</html>

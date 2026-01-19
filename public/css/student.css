@@ -1,0 +1,171 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+header {
+    margin-bottom: 40px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+}
+
+.state-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.state-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 25px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.state-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.state-btn:hover::before {
+    opacity: 1;
+}
+
+.state-btn[data-state="1"] {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(185, 28, 28, 0.8));
+    box-shadow: 0 8px 32px rgba(239, 68, 68, 0.3);
+}
+
+.state-btn[data-state="2"] {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.8), rgba(194, 65, 12, 0.8));
+    box-shadow: 0 8px 32px rgba(249, 115, 22, 0.3);
+}
+
+.state-btn[data-state="3"] {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.8), rgba(161, 98, 7, 0.8));
+    box-shadow: 0 8px 32px rgba(234, 179, 8, 0.3);
+}
+
+.state-btn[data-state="4"] {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.8), rgba(21, 128, 61, 0.8));
+    box-shadow: 0 8px 32px rgba(34, 197, 94, 0.3);
+}
+
+.state-btn[data-state="5"] {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(29, 78, 216, 0.8));
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+}
+
+.state-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+}
+
+.state-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.state-btn.selected {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5), 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.emoji {
+    font-size: 2rem;
+}
+
+.label {
+    color: #fff;
+    font-weight: 600;
+    flex: 1;
+    text-align: center;
+}
+
+.number {
+    width: 35px;
+    height: 35px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.status-message {
+    margin-top: 30px;
+    padding: 15px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.95rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.status-message.show {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.status-message.error {
+    background: rgba(239, 68, 68, 0.3);
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2rem;
+    }
+    
+    .state-btn {
+        padding: 18px 20px;
+    }
+    
+    .emoji {
+        font-size: 1.8rem;
+    }
+}
