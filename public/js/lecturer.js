@@ -1,5 +1,6 @@
-// Chart instance
+// Chart instances
 let histogramChart = null;
+let timeSeriesChart = null;
 
 // Mean descriptions based on value
 function getMeanDescription(mean) {
@@ -32,6 +33,9 @@ function updateStats(stats) {
 
     // Update histogram
     updateHistogram(stats.histogram);
+
+    // Update time-series chart
+    updateTimeSeries(stats.timeHistory || []);
 }
 
 // Initialize or update the histogram chart
@@ -132,6 +136,99 @@ function updateHistogram(histogram) {
                             display: false
                         }
                     }
+                }
+            }
+        });
+    }
+}
+
+// Initialize or update the time-series chart
+function updateTimeSeries(history) {
+    const ctx = document.getElementById('time-series').getContext('2d');
+
+    const labels = history.map(point => point.time);
+    const data = history.map(point => point.mean);
+
+    if (timeSeriesChart) {
+        // Update existing chart
+        timeSeriesChart.data.labels = labels;
+        timeSeriesChart.data.datasets[0].data = data;
+        timeSeriesChart.update('none');
+    } else {
+        // Create gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
+        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+        // Create new chart
+        timeSeriesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Average Understanding',
+                    data: data,
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgb(59, 130, 246)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 13 },
+                        callbacks: {
+                            label: function (context) {
+                                return `Average: ${context.raw.toFixed(2)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 1,
+                        max: 5,
+                        ticks: {
+                            stepSize: 1,
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            callback: function (value) {
+                                const labels = ['', 'Lost', 'Struggling', 'Following', 'Comfortable', 'Speed Up'];
+                                return labels[value] || value;
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            maxRotation: 45,
+                            minRotation: 45,
+                            maxTicksLimit: 10
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 300
                 }
             }
         });

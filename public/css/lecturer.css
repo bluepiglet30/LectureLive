@@ -108,6 +108,10 @@ h2 {
     max-height: 300px;
 }
 
+#time-series {
+    max-height: 250px;
+}
+
 .legend {
     display: flex;
     flex-wrap: wrap;
