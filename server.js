@@ -25,6 +25,10 @@ const studentStates = new Map();
 const timeHistory = [];
 const MAX_HISTORY_POINTS = 100; // Keep last 100 data points
 
+// Anonymous questions storage: { id, text, timestamp }
+const questions = [];
+let questionIdCounter = 1;
+
 // Calculate statistics
 function getStats() {
     const states = Array.from(studentStates.values());
@@ -35,7 +39,8 @@ function getStats() {
             count: 0,
             mean: 0,
             histogram: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-            timeHistory: timeHistory
+            timeHistory: timeHistory,
+            questions: questions
         };
     }
 
@@ -47,7 +52,7 @@ function getStats() {
         histogram[state]++;
     });
 
-    return { count, mean, histogram, timeHistory };
+    return { count, mean, histogram, timeHistory, questions };
 }
 
 // Record a new data point in time history
@@ -89,10 +94,50 @@ app.get('/api/stats', (req, res) => {
     res.json(getStats());
 });
 
+// Submit anonymous question
+app.post('/api/question', (req, res) => {
+    const { text } = req.body;
+
+    if (!text || text.trim().length === 0) {
+        return res.status(400).json({ error: 'Question text is required' });
+    }
+
+    const question = {
+        id: questionIdCounter++,
+        text: text.trim().substring(0, 500), // Limit to 500 chars
+        timestamp: new Date().toISOString()
+    };
+
+    questions.push(question);
+
+    // Broadcast updated stats to all connected clients
+    io.emit('stats-update', getStats());
+
+    res.json({ success: true, question });
+});
+
+// Dismiss a question
+app.post('/api/question/:id/dismiss', (req, res) => {
+    const id = parseInt(req.params.id);
+    const index = questions.findIndex(q => q.id === id);
+
+    if (index === -1) {
+        return res.status(404).json({ error: 'Question not found' });
+    }
+
+    questions.splice(index, 1);
+
+    // Broadcast updated stats to all connected clients
+    io.emit('stats-update', getStats());
+
+    res.json({ success: true });
+});
+
 // Reset endpoint for lecturer
 app.post('/api/reset', (req, res) => {
     studentStates.clear();
     timeHistory.length = 0; // Clear time history
+    questions.length = 0; // Clear questions
     io.emit('stats-update', getStats());
     res.json({ success: true });
 });

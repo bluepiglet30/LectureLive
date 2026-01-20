@@ -36,6 +36,77 @@ function updateStats(stats) {
 
     // Update time-series chart
     updateTimeSeries(stats.timeHistory || []);
+
+    // Update questions panel
+    updateQuestions(stats.questions || []);
+}
+
+// Format timestamp for display
+function formatTime(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+// Update the questions panel
+function updateQuestions(questions) {
+    const listEl = document.getElementById('questions-list');
+    const countEl = document.getElementById('questions-count');
+    const emptyEl = document.getElementById('questions-empty');
+
+    // Update count badge
+    countEl.textContent = questions.length;
+
+    // Show/hide empty state
+    if (questions.length === 0) {
+        emptyEl.style.display = 'block';
+        // Remove all question cards
+        listEl.querySelectorAll('.question-card').forEach(card => card.remove());
+        return;
+    }
+
+    emptyEl.style.display = 'none';
+
+    // Create question cards HTML
+    const questionsHtml = questions.map(q => `
+        <div class="question-card" data-id="${q.id}">
+            <div class="question-content">
+                <div class="question-text">${escapeHtml(q.text)}</div>
+                <div class="question-time">${formatTime(q.timestamp)}</div>
+            </div>
+            <button class="question-dismiss" onclick="dismissQuestion(${q.id})" title="Dismiss question">✕</button>
+        </div>
+    `).join('');
+
+    // Update only if content changed
+    const currentCards = listEl.querySelectorAll('.question-card');
+    const currentIds = Array.from(currentCards).map(c => c.dataset.id).join(',');
+    const newIds = questions.map(q => q.id).join(',');
+
+    if (currentIds !== newIds) {
+        // Keep empty element, replace cards
+        listEl.innerHTML = `<div class="questions-empty" id="questions-empty" style="display: none;">
+            No questions yet. Students can submit anonymous questions.
+        </div>` + questionsHtml;
+    }
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Dismiss a question
+async function dismissQuestion(id) {
+    try {
+        await fetch(`/api/question/${id}/dismiss`, { method: 'POST' });
+    } catch (error) {
+        console.error('Error dismissing question:', error);
+    }
 }
 
 // Initialize or update the histogram chart

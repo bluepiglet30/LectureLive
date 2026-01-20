@@ -76,4 +76,62 @@ document.addEventListener('DOMContentLoaded', () => {
             submitState(state);
         });
     });
+
+    // Question panel toggle
+    const questionToggle = document.getElementById('question-toggle');
+    const questionPanel = document.getElementById('question-panel');
+    const questionInput = document.getElementById('question-input');
+    const questionSubmit = document.getElementById('question-submit');
+
+    questionToggle.addEventListener('click', () => {
+        questionToggle.classList.toggle('active');
+        questionPanel.classList.toggle('show');
+        if (questionPanel.classList.contains('show')) {
+            questionInput.focus();
+        }
+    });
+
+    // Submit question
+    async function submitQuestion() {
+        const text = questionInput.value.trim();
+
+        if (!text) {
+            showStatus('Please enter a question first.', true);
+            return;
+        }
+
+        questionSubmit.disabled = true;
+
+        try {
+            const response = await fetch('/api/question', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to submit question');
+            }
+
+            questionInput.value = '';
+            showStatus('Question sent anonymously! ✓');
+        } catch (error) {
+            console.error('Error submitting question:', error);
+            showStatus('Failed to send question. Please try again.', true);
+        } finally {
+            questionSubmit.disabled = false;
+        }
+    }
+
+    questionSubmit.addEventListener('click', submitQuestion);
+
+    // Also submit on Enter key (Ctrl+Enter for multi-line)
+    questionInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            submitQuestion();
+        }
+    });
 });

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LectureLive - Student</title>
     <link rel="stylesheet" href="css/student.css">
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -19,25 +21,25 @@
                 <span class="label">Completely Lost</span>
                 <span class="number">1</span>
             </button>
-            
+
             <button class="state-btn" data-state="2">
                 <span class="emoji">😕</span>
                 <span class="label">Struggling</span>
                 <span class="number">2</span>
             </button>
-            
+
             <button class="state-btn" data-state="3">
                 <span class="emoji">🙂</span>
                 <span class="label">Following Along</span>
                 <span class="number">3</span>
             </button>
-            
+
             <button class="state-btn" data-state="4">
                 <span class="emoji">😊</span>
                 <span class="label">Comfortable</span>
                 <span class="number">4</span>
             </button>
-            
+
             <button class="state-btn" data-state="5">
                 <span class="emoji">🚀</span>
                 <span class="label">Speed Up!</span>
@@ -46,8 +48,24 @@
         </div>
 
         <div class="status-message" id="status"></div>
+
+        <div class="question-section">
+            <button class="question-toggle" id="question-toggle">
+                <span class="toggle-icon">❓</span>
+                <span>Ask a Question</span>
+            </button>
+            <div class="question-panel" id="question-panel">
+                <textarea id="question-input" class="question-input" placeholder="Type your anonymous question..."
+                    rows="3" maxlength="500"></textarea>
+                <button class="question-submit" id="question-submit">
+                    <span>Send Question</span>
+                    <span class="submit-icon">📤</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <script src="js/student.js"></script>
 </body>
+
 </html>
